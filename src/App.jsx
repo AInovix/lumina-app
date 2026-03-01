@@ -3,14 +3,17 @@ import ReactFlow, { Background, Controls, Handle, Position } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Upload, X, Brain, Trophy, BookOpen, Sparkles, CheckCircle, Play } from 'lucide-react';
 
+// Custom Node Component
 const CustomNode = ({ data }) => (
-  <div className={`p-4 rounded-xl border-2 shadow-lg cursor-pointer ${data.completed ? 'bg-emerald-900/60 border-emerald-400' : 'bg-indigo-900/60 border-indigo-400'}`}>
+  <div className={`p-4 rounded-xl border-2 shadow-lg cursor-pointer transition-all hover:scale-105 ${
+    data.completed ? 'bg-emerald-900/60 border-emerald-400' : 'bg-indigo-900/60 border-indigo-400'
+  }`}>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-white" />
     <div className="flex items-center gap-2">
       {data.completed ? <CheckCircle size={16} className="text-emerald-400" /> : <Brain size={16} className="text-indigo-400" />}
       <div>
         <p className="font-bold text-sm text-white">{data.label}</p>
-        <p className="text-xs opacity-70 text-slate-300">{data.xp} XP</p>
+        <p className="text-xs opacity-70 text-slate-300">{data.xp} XP • {data.rarity}</p>
       </div>
     </div>
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-white" />
@@ -25,13 +28,62 @@ export default function LuminaApp() {
   const [activeNode, setActiveNode] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Demo book data
+  // Demo book data - PROPERLY FORMATTED with data: {}
   const demoNodes = [
-    { id: '1', type: 'custom', position: { x: 250, y: 50 },  { label: 'The Hero', type: 'Core', rarity: 'legendary', xp: 500, completed: false, content: 'The protagonist who transforms through adventure.' } },
-    { id: '2', type: 'custom', position: { x: 100, y: 200 },  { label: 'The Mentor', type: 'Archetype', rarity: 'epic', xp: 300, completed: false, content: 'Wise guide who provides tools and wisdom.' } },
-    { id: '3', type: 'custom', position: { x: 400, y: 200 },  { label: 'The Threshold', type: 'Plot', rarity: 'rare', xp: 200, completed: false, content: 'Point of no return into the special world.' } },
-    { id: '4', type: 'custom', position: { x: 250, y: 350 },  { label: 'The Ordeal', type: 'Climax', rarity: 'legendary', xp: 500, completed: false, content: 'Central crisis where hero faces greatest fear.' } },
+    { 
+      id: '1', 
+      type: 'custom', 
+      position: { x: 250, y: 50 },
+      data: { 
+        label: 'The Hero', 
+        type: 'Core', 
+        rarity: 'legendary', 
+        xp: 500, 
+        completed: false, 
+        content: 'The protagonist who transforms through adventure.' 
+      } 
+    },
+    { 
+      id: '2', 
+      type: 'custom', 
+      position: { x: 100, y: 200 },
+      data: { 
+        label: 'The Mentor', 
+        type: 'Archetype', 
+        rarity: 'epic', 
+        xp: 300, 
+        completed: false, 
+        content: 'Wise guide who provides tools and wisdom.' 
+      } 
+    },
+    { 
+      id: '3', 
+      type: 'custom', 
+      position: { x: 400, y: 200 },
+      data: { 
+        label: 'The Threshold', 
+        type: 'Plot', 
+        rarity: 'rare', 
+        xp: 200, 
+        completed: false, 
+        content: 'Point of no return into the special world.' 
+      } 
+    },
+    { 
+      id: '4', 
+      type: 'custom', 
+      position: { x: 250, y: 350 },
+      data: { 
+        label: 'The Ordeal', 
+        type: 'Climax', 
+        rarity: 'legendary', 
+        xp: 500, 
+        completed: false, 
+        content: 'Central crisis where hero faces greatest fear.' 
+      } 
+    },
   ];
+
   const demoEdges = [
     { id: 'e1-2', source: '1', target: '2', animated: true },
     { id: 'e1-3', source: '1', target: '3', animated: true },
@@ -48,12 +100,12 @@ export default function LuminaApp() {
     const file = e.target.files?.[0];
     if (file) {
       setBookTitle(file.name.replace(/\.[^/.]+$/, ''));
-      setView('map'); // Skip AI for now - just show demo map
+      setView('map');
     }
   };
 
   const handleNodeClick = (_, node) => {
-    if (!node.data.completed) {
+    if (!node.data?.completed) {
       setActiveNode(node.data);
     }
   };
@@ -66,14 +118,18 @@ export default function LuminaApp() {
     setActiveNode(null);
   };
 
+  // Prepare nodes for ReactFlow with updated completion status
   const flowNodes = demoNodes.map(n => ({
     ...n,
-     { ...n.data, completed: completedNodes.includes(n.id) }
+    data: { 
+      ...n.data, 
+      completed: completedNodes.includes(n.id) 
+    }
   }));
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      {/* Background */}
+      {/* Background Glow */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl" />
@@ -98,7 +154,7 @@ export default function LuminaApp() {
         )}
       </header>
 
-      {/* Main */}
+      {/* Main Content */}
       <main className="relative z-10 h-[calc(100vh-80px)] flex items-center justify-center p-4">
         
         {/* UPLOAD VIEW */}
@@ -109,7 +165,7 @@ export default function LuminaApp() {
                 <Sparkles size={14} className="text-emerald-400" />
                 <span className="text-sm text-emerald-300">100% Free • No API Key</span>
               </div>
-              <h2 className="text-4xl font-bold mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Turn Books into <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Learning Games</span>
               </h2>
               <p className="text-slate-400 text-lg">Upload a text file or try the demo</p>
@@ -130,7 +186,7 @@ export default function LuminaApp() {
             </div>
             <input ref={fileInputRef} type="file" accept=".txt,.md" onChange={handleFile} className="hidden" />
 
-            {/* DEMO BUTTON - THIS IS WHAT YOU WERE MISSING */}
+            {/* DEMO BUTTON */}
             <button
               onClick={handleDemo}
               className="w-full max-w-md py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/30"
@@ -152,7 +208,7 @@ export default function LuminaApp() {
           >
             <Background color="#475569" gap={25} size={1} />
             <Controls className="bg-slate-800 border-slate-600 text-white rounded-lg" />
-            <div className="absolute top-4 left-4 bg-slate-900/90 p-4 rounded-xl border border-slate-700">
+            <div className="absolute top-4 left-4 bg-slate-900/90 p-4 rounded-xl border border-slate-700 max-w-xs">
               <p className="font-bold text-white mb-2">Progress</p>
               <p className="text-sm text-slate-400">{completedNodes.length}/{demoNodes.length} mastered</p>
               <button onClick={() => setView('upload')} className="mt-3 text-sm text-indigo-400 hover:text-indigo-300">
