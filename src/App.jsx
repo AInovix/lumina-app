@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import ReactFlow, { Background, Controls, Handle, Position } from 'react-flow-renderer';
+import ReactFlow, { Background, Controls, Handle, Position } from 'reactflow';
+import 'reactflow/dist/style.css';
 import { Upload, X, Brain, Trophy, BookOpen, Sparkles, CheckCircle, Play } from 'lucide-react';
 
 const CustomNode = ({ data }) => (
